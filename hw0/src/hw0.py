@@ -1,3 +1,9 @@
+'''
+Name: Hugh Krogh-Freeman
+UNI: hk2903
+Date: 2017-09-10
+Class: COMS W4705.001
+'''
 from sklearn.datasets import fetch_20newsgroups
 from sklearn.feature_extraction.text import TfidfVectorizer
 import sklearn.metrics
