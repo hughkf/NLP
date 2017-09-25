@@ -4,26 +4,14 @@ Created on Sun Sep 24 13:40:16 2017
 
 @author: Hugh Krogh-Freeman
 """
+from sklearn.feature_selection import SelectKBest, mutual_info_classif
 import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer
 from scipy.sparse import hstack
 import emoji
 from sklearn.naive_bayes import MultinomialNB
 import pickle
-import sys
-
-class Unbuffered(object):
-   def __init__(self, stream):
-       self.stream = stream
-   def write(self, data):
-       self.stream.write(data)
-       self.stream.flush()
-   def writelines(self, datas):
-       self.stream.writelines(datas)
-       self.stream.flush()
-   def __getattr__(self, attr):
-       return getattr(self.stream, attr)
-sys.stdout = Unbuffered(sys.stdout)
+from sklearn.metrics import confusion_matrix
 
 def get_char_count(text_list):
     '''Tweet character count'''
@@ -190,3 +178,21 @@ def print_top20_features(model, feature_names):
     l = sorted(zip(model.coef_[0], feature_names), reverse=True)    
     return '\n'.join(['%d. feature: "%s" (score: %f)' % (n+1, x[1], x[0]) 
         for n, x in enumerate(l[:20])])
+
+def doit(train, y_train, test, y_test, clf, ngrams):
+    '''takes care of training, testing, and printing details about
+    each model in hw1.py
+    '''
+    # select features
+    X_train, X_test, vectorizer = get_features(train, y_train, test, ngrams)
+    sel = SelectKBest(mutual_info_classif, k=300)
+    sel.fit(X_train, y_train)
+    # train and test
+    clf.fit(X_train.tocsr()[:,sel.get_support()], y_train)
+    print ('* Accuracy:', clf.score(X_test.tocsr()[:,sel.get_support()], y_test))
+    print ('* Top 20 features:')
+    print (print_top20_features(clf, 
+                      get_feature_names(vectorizer)[sel.get_support()]))
+    print ('* Continency matrix:')
+    y_pred = clf.predict(X_test.tocsr()[:,sel.get_support()])
+    print (confusion_matrix(y_test, y_pred))
