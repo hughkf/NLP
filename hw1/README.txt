@@ -1,9 +1,13 @@
 * Name: Hugh Krogh-Freeman
 * Email: hk2903@columbia.edu
 * Homework: #1
+
 * How to train and test classifier: 
 - Run "classify.py [train filename] [test filename]"
 - e.g. classify.py ./train.txt ./test.txt
+- or 
+- Run "hw1.py [train filename] [test filename]"
+- e.g. hw1.py ./train.txt ./test.txt
 
 * Special features and limitations of this classifier:
 - There are only two classes: 1 for Democrat, 0 for Republican

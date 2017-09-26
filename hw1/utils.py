@@ -4,6 +4,22 @@ Created on Sun Sep 24 13:40:16 2017
 
 @author: Hugh Krogh-Freeman
 """
+import sys
+import os
+
+class Unbuffered(object):
+   def __init__(self, stream):
+       self.stream = stream
+   def write(self, data):
+       self.stream.write(data)
+       self.stream.flush()
+   def writelines(self, datas):
+       self.stream.writelines(datas)
+       self.stream.flush()
+   def __getattr__(self, attr):
+       return getattr(self.stream, attr)
+sys.stdout = Unbuffered(sys.stdout)
+
 from sklearn.feature_selection import SelectKBest, mutual_info_classif
 import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer
@@ -97,6 +113,8 @@ def get_data(filename):
     with open(filename, 'r', encoding='utf8') as f:
         contents = f.read()
         for line in contents.split('\n'):
+            if line is None or not len(line):
+                continue
             pieces = line.split()
             data.append(' '.join(pieces[:-1]))
             y.append(1 if pieces[-1] == 'democrat' else 0)
@@ -176,23 +194,54 @@ def classify(train_filename, test_filename):
 def print_top20_features(model, feature_names):
     '''sort, index, and print top 20 features'''    
     l = sorted(zip(model.coef_[0], feature_names), reverse=True)    
-    return '\n'.join(['%d. feature: "%s" (score: %f)' % (n+1, x[1], x[0]) 
+    return '\n'.join(['%d. "%s" (score: %f)' % (n+1, x[1], x[0]) 
         for n, x in enumerate(l[:20])])
 
 def doit(train, y_train, test, y_test, clf, ngrams):
     '''takes care of training, testing, and printing details about
+
     each model in hw1.py
     '''
-    # select features
+    # vectorized feature data
     X_train, X_test, vectorizer = get_features(train, y_train, test, ngrams)
-    sel = SelectKBest(mutual_info_classif, k=300)
-    sel.fit(X_train, y_train)
-    # train and test
-    clf.fit(X_train.tocsr()[:,sel.get_support()], y_train)
-    print ('* Accuracy:', clf.score(X_test.tocsr()[:,sel.get_support()], y_test))
+
+    # select features
+    pkl_file = 'ngram=%d_feature_indices.pkl' % ngrams
+    if os.path.exists(pkl_file):
+        with open(pkl_file, 'rb') as f:
+            mask = pickle.load(f)
+    else:
+        sel = SelectKBest(mutual_info_classif, k=300)
+        # train and test
+        sel.fit(X_train, y_train)
+        mask = sel.get_support()
+
+    clf.fit(X_train.tocsr()[:,mask], y_train)
+    print ('* Accuracy:', clf.score(X_test.tocsr()[:,mask], y_test))
     print ('* Top 20 features:')
     print (print_top20_features(clf, 
-                      get_feature_names(vectorizer)[sel.get_support()]))
+                      get_feature_names(vectorizer)[mask]))
     print ('* Continency matrix:')
-    y_pred = clf.predict(X_test.tocsr()[:,sel.get_support()])
+    y_pred = clf.predict(X_test.tocsr()[:,mask])
     print (confusion_matrix(y_test, y_pred))
+    
+def analyze(model_filename, vectorized_test_data_filename):
+    '''Prints top 20 features and contingency table for model'''
+    
+    with open(vectorized_test_data_filename, 'rb') as f:
+        vectorized_test_data = pickle.load(f)
+        vectorized_test_data_X, vectorized_test_data_y = vectorized_test_data
+
+    with open(model_filename, 'rb') as f:
+        model = pickle.load(f)
+
+    '''sort, index, and print top 20 features'''            
+    with open('features.pkl', 'rb') as f:
+        feature_names = pickle.load(f)
+    print ('* Top 20 features:')
+    print (print_top20_features(model, feature_names))
+    
+    '''print confusion matrix'''
+    print ('* Continency matrix:')
+    y_pred = model.predict(vectorized_test_data_X)
+    print (confusion_matrix(vectorized_test_data_y, y_pred))

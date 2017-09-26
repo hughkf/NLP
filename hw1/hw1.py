@@ -5,7 +5,6 @@ Created on Sun Sep 24 19:18:15 2017
 @author: Hugh Krogh-Freeman
 """
 import utils
-from analyze import analyze
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import LinearSVC
 from sklearn.naive_bayes import MultinomialNB
@@ -18,7 +17,7 @@ test_filename = sys.argv[2]
 
 '''Best Model: Naive Bayes using unigrams'''
 utils.classify(train_filename, test_filename)
-analyze('model.pkl', 'test.pkl')
+utils.analyze('model.pkl', 'test.pkl')
 
 '''get data for training and testing'''
 train, y_train = utils.get_data(train_filename)
@@ -37,7 +36,7 @@ utils.doit(train, y_train, test, y_test, svc, 2)
 print ('\n\n~~~ Logistic regression model using trigrams ~~~')
 # select features
 clf = LogisticRegression(solver='newton-cg', max_iter=1000, C=1.0, 
-     fit_intercept=True, penalty='l2')
+                         fit_intercept=True, penalty='l2')
 utils.doit(train, y_train, test, y_test, clf, 3)
 
 print (datetime.now())
