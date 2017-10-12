@@ -1,10 +1,6 @@
-import re
-
 # config {stack,buffer,label} 0.9396670645974269
 def get_features(config,sent_dict):
     features = []
-
-    # TODO Improve Features
     
     # distance between top of stack and first element in the buffer
     if len(config[0]) > 0 and len(config[1]) > 0:
@@ -18,11 +14,9 @@ def get_features(config,sent_dict):
 
     # first word in the buffer
     if len(config[1]) > 0:
-        first = config[1][-1]
-        # token
-        features.append('TOP_BUFF_TOKEN_'+str(sent_dict['FORM'][first].lower()))
+        features.append('TOP_BUFF_TOKEN_'+str(sent_dict['FORM'][config[1][-1]].lower()))
         # POS of first word in the buffer
-        features.append('TOP_BUFF_POS_'+str(sent_dict['CPOSTAG'][first]))
+        features.append('TOP_BUFF_POS_'+str(sent_dict['CPOSTAG'][config[1][-1]]))
 
     # second word in the buffer
     if len(config[1]) > 1:
@@ -48,19 +42,15 @@ def get_features(config,sent_dict):
 
     # top of stack word
     if len(config[0]) > 0:
-        # Top of stack.
-        top = config[0][-1]
-        # Token
-        features.append('TOP_STK_TOKEN_'+str(sent_dict['FORM'][top].lower()))
-        features.append('TOP_STK_POS_' + sent_dict['CPOSTAG'][top])
-        features.append('TOP_STK_LEMMA_'+str(sent_dict['LEMMA'][top].lower())) 
-        features.append('TOP_STK_POSTAG_' + sent_dict['POSTAG'][top])
+        features.append('TOP_STK_TOKEN_'+str(sent_dict['FORM'][config[0][-1]].lower()))
+        features.append('TOP_STK_POS_' + sent_dict['CPOSTAG'][config[0][-1]])
+        features.append('TOP_STK_LEMMA_'+str(sent_dict['LEMMA'][config[0][-1]].lower())) 
+        features.append('TOP_STK_POSTAG_' + sent_dict['POSTAG'][config[0][-1]])
         
     # 2nd item from top of stack
     if len(config[0]) > 1:
         # Top 2nd item of the stack
-        top = config[0][-2]
-        features.append('TOP2_STK_TOKEN_'+str(sent_dict['FORM'][top].lower()))
+        features.append('TOP2_STK_TOKEN_'+str(sent_dict['FORM'][config[0][-2]].lower()))
         features.append('TOP2_STK_POS_'+str(sent_dict['CPOSTAG'][config[0][-2]]))
 
     # 3rd item from top of stack
