@@ -1,7 +1,9 @@
-# config {stack,buffer,label} 0.9396670645974269
+import re
+
+# config {stack,buffer,label} 0.9417628332670116
 def get_features(config,sent_dict):
     features = []
-    
+
     # distance between top of stack and first element in the buffer
     if len(config[0]) > 0 and len(config[1]) > 0:
         distance = config[0][-1] - config[1][-1]
@@ -58,5 +60,10 @@ def get_features(config,sent_dict):
         # Top 3rd item of the stack
         features.append('TOP3_STK_LEMMA_'+str(sent_dict['LEMMA'][config[0][-3]].lower()))    
         features.append('TOP3_STK_POS_'+str(sent_dict['CPOSTAG'][config[0][-3]]))    
+
+    features.append('NOUN_COUNT_' + str(sent_dict['CPOSTAG'].count('NOUN')))
+    features.append('PUNCT_COUNT_' + str(sent_dict['CPOSTAG'].count('PUNCT')))
+    features.append('WORD_TO_' + str('TO' in sent_dict['FORM']))
+    features.append('VERB_IND_' + str('VERB' in sent_dict['CPOSTAG']))
 
     return features

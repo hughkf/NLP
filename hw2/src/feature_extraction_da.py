@@ -1,4 +1,8 @@
 # config {buffer,stack,label}
+'''
+0.9114285714285714
+0.9130434782608695
+'''
 def get_features_da(config,sent_dict):
     features = []
 
@@ -15,29 +19,22 @@ def get_features_da(config,sent_dict):
     # first word in the buffer
     if len(config[1]) > 0:
         features.append('TOP_BUFF_TOKEN_'+str(sent_dict['FORM'][config[1][-1]].lower()))
-        # POS of first word in the buffer
         features.append('TOP_BUFF_POS_'+str(sent_dict['CPOSTAG'][config[1][-1]]))
 
     # second word in the buffer
     if len(config[1]) > 1:
-        # token
         features.append('SEC_BUFF_TOKEN_'+str(sent_dict['FORM'][config[1][-2]].lower()))
-        # POS 
         features.append('SEC_BUFF_POS_'+str(sent_dict['CPOSTAG'][config[1][-2]]))
         features.append('SEC_BUFF_POSTAG_'+str(sent_dict['POSTAG'][config[1][-2]]))
 
     # third word in the buffer
     if len(config[1]) > 2:
-        # token
         features.append('THIRD_BUFF_TOKEN_'+str(sent_dict['FORM'][config[1][-3]].lower()))
-        # POS
         features.append('THIRD_BUFF_POS_'+str(sent_dict['CPOSTAG'][config[1][-3]]))
 
     # fourth word in the buffer    
     if len(config[1]) > 3:
-        # token
         features.append('FOURTH_BUFF_TOKEN_'+str(sent_dict['FORM'][config[1][-4]].lower()))
-        # POS
         features.append('FOURTH_BUFF_POS_'+str(sent_dict['CPOSTAG'][config[1][-4]]))
 
     # top of stack word
@@ -59,15 +56,18 @@ def get_features_da(config,sent_dict):
         features.append('TOP3_STK_LEMMA_'+str(sent_dict['LEMMA'][config[0][-3]].lower()))    
         features.append('TOP3_STK_POS_'+str(sent_dict['CPOSTAG'][config[0][-3]]))    
 
+    # is this a question or exclamation or neither (none)?
     def punctuation_type(sent_dict):
         if '!' in sent_dict['FORM']:
             return 1
         elif '?' in sent_dict['FORM']:
             return 2
+        elif '.' in sent_dict['FORM']:
+            return 3
 
     features.append('PUNCT_TYPE_' + str(punctuation_type(sent_dict)))
     features.append('VERB_IND_' + str('VERB' in sent_dict['CPOSTAG']))
-    features.append('WH_IND_' + str(len(set(sent_dict['FORM'])
-        .intersection(set(['who', 'what', 'why', 'where', 'when']))) > 0))
-
+    features.append('VERB_COUNT_' + str(sent_dict['CPOSTAG'].count('VERB')))
+    features.append('WORD_TO_' + str('TO' in sent_dict['FORM']))
+    
     return features
