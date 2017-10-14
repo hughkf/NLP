@@ -1,10 +1,4 @@
-import re
-
 # config {buffer,stack,label}
-'''
-0.9114285714285714
-0.9130434782608695
-'''
 def get_features_da(config,sent_dict):
     features = []
 
@@ -69,24 +63,6 @@ def get_features_da(config,sent_dict):
     features.append('MD_IND_' + str('MD' in sent_dict['POSTAG']))
     features.append('UH_IND_' + str('UH' in sent_dict['POSTAG']))
     features.append('NOUN_COUNT_' + str('NOUN' in sent_dict['CPOSTAG']))
-
-
-
-#    features.append('PUNCT_COUNT_' + str(sent_dict['CPOSTAG'].count('PUNCT')))
-#    features.append('WORD_COUNT_' + str(len(sent_dict['FORM']) 
-#        - sent_dict['CPOSTAG'].count('PUNCT')))
-#
-#    features.append('SYM_IND_' + str(sent_dict['POSTAG'].count('SYM')))
-#    features.append('VBZ_IND_' + str(sent_dict['POSTAG'].count('VBZ')))
-#    features.append('VBN_IND_' + str(sent_dict['POSTAG'].count('VBN')))    
-#    features.append('WDT_IND_' + str(sent_dict['POSTAG'].count('WDT')))
-#    features.append('WP_IND_' + str(sent_dict['POSTAG'].count('WP')))
-#    features.append('WRB_IND_' + str(sent_dict['POSTAG'].count('WRB')))
-#    
-#    features.append('WP_POS_IND_' + str(sent_dict['POSTAG'].count('WP$')))
-#    features.append('FW_IND_' + str(sent_dict['POSTAG'].count('FW')))
-#    features.append('LS_IND_' + str('LS' in sent_dict['POSTAG']))
-
     features.append('VBG_IND_' + str('VBG' in sent_dict['POSTAG']))
 
     return features

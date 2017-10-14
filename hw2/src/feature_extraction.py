@@ -1,6 +1,4 @@
-import re
-
-# config {stack,buffer,label} 0.9491064645660746
+# config {stack,buffer,label} 
 def get_features(config,sent_dict):
     features = []
 
