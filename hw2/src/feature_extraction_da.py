@@ -1,3 +1,5 @@
+import re
+
 # config {buffer,stack,label}
 '''
 0.9114285714285714
@@ -19,22 +21,29 @@ def get_features_da(config,sent_dict):
     # first word in the buffer
     if len(config[1]) > 0:
         features.append('TOP_BUFF_TOKEN_'+str(sent_dict['FORM'][config[1][-1]].lower()))
+        # POS of first word in the buffer
         features.append('TOP_BUFF_POS_'+str(sent_dict['CPOSTAG'][config[1][-1]]))
 
     # second word in the buffer
     if len(config[1]) > 1:
+        # token
         features.append('SEC_BUFF_TOKEN_'+str(sent_dict['FORM'][config[1][-2]].lower()))
+        # POS 
         features.append('SEC_BUFF_POS_'+str(sent_dict['CPOSTAG'][config[1][-2]]))
         features.append('SEC_BUFF_POSTAG_'+str(sent_dict['POSTAG'][config[1][-2]]))
 
     # third word in the buffer
     if len(config[1]) > 2:
+        # token
         features.append('THIRD_BUFF_TOKEN_'+str(sent_dict['FORM'][config[1][-3]].lower()))
+        # POS
         features.append('THIRD_BUFF_POS_'+str(sent_dict['CPOSTAG'][config[1][-3]]))
 
     # fourth word in the buffer    
     if len(config[1]) > 3:
+        # token
         features.append('FOURTH_BUFF_TOKEN_'+str(sent_dict['FORM'][config[1][-4]].lower()))
+        # POS
         features.append('FOURTH_BUFF_POS_'+str(sent_dict['CPOSTAG'][config[1][-4]]))
 
     # top of stack word
@@ -56,18 +65,28 @@ def get_features_da(config,sent_dict):
         features.append('TOP3_STK_LEMMA_'+str(sent_dict['LEMMA'][config[0][-3]].lower()))    
         features.append('TOP3_STK_POS_'+str(sent_dict['CPOSTAG'][config[0][-3]]))    
 
-    # is this a question or exclamation or neither (none)?
-    def punctuation_type(sent_dict):
-        if '!' in sent_dict['FORM']:
-            return 1
-        elif '?' in sent_dict['FORM']:
-            return 2
-        elif '.' in sent_dict['FORM']:
-            return 3
-
-    features.append('PUNCT_TYPE_' + str(punctuation_type(sent_dict)))
     features.append('VERB_IND_' + str('VERB' in sent_dict['CPOSTAG']))
-    features.append('VERB_COUNT_' + str(sent_dict['CPOSTAG'].count('VERB')))
-    features.append('WORD_TO_' + str('TO' in sent_dict['FORM']))
-    
+    features.append('MD_IND_' + str('MD' in sent_dict['POSTAG']))
+    features.append('UH_IND_' + str('UH' in sent_dict['POSTAG']))
+    features.append('NOUN_COUNT_' + str('NOUN' in sent_dict['CPOSTAG']))
+
+
+
+#    features.append('PUNCT_COUNT_' + str(sent_dict['CPOSTAG'].count('PUNCT')))
+#    features.append('WORD_COUNT_' + str(len(sent_dict['FORM']) 
+#        - sent_dict['CPOSTAG'].count('PUNCT')))
+#
+#    features.append('SYM_IND_' + str(sent_dict['POSTAG'].count('SYM')))
+#    features.append('VBZ_IND_' + str(sent_dict['POSTAG'].count('VBZ')))
+#    features.append('VBN_IND_' + str(sent_dict['POSTAG'].count('VBN')))    
+#    features.append('WDT_IND_' + str(sent_dict['POSTAG'].count('WDT')))
+#    features.append('WP_IND_' + str(sent_dict['POSTAG'].count('WP')))
+#    features.append('WRB_IND_' + str(sent_dict['POSTAG'].count('WRB')))
+#    
+#    features.append('WP_POS_IND_' + str(sent_dict['POSTAG'].count('WP$')))
+#    features.append('FW_IND_' + str(sent_dict['POSTAG'].count('FW')))
+#    features.append('LS_IND_' + str('LS' in sent_dict['POSTAG']))
+
+    features.append('VBG_IND_' + str('VBG' in sent_dict['POSTAG']))
+
     return features
